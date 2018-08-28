@@ -41,7 +41,7 @@ type Locker struct {
 	opts   Options
 
 	token string
-	mutex sync.Mutex
+	Mutex sync.Mutex
 }
 
 // Run runs a callback handler with a Redis lock. It may return ErrLockNotObtained
@@ -91,9 +91,9 @@ func New(client RedisClient, key string, opts *Options) *Locker {
 
 // IsLocked returns true if a lock is still being held.
 func (l *Locker) IsLocked() bool {
-	l.mutex.Lock()
+	l.Mutex.Lock()
 	locked := l.token != ""
-	l.mutex.Unlock()
+	l.Mutex.Unlock()
 
 	return locked
 }
@@ -106,8 +106,8 @@ func (l *Locker) Lock() (bool, error) {
 // LockWithContext is like Lock but allows to pass an additional context which allows cancelling
 // lock attempts prematurely.
 func (l *Locker) LockWithContext(ctx context.Context) (bool, error) {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
+	l.Mutex.Lock()
+	defer l.Mutex.Unlock()
 
 	if l.token != "" {
 		return l.refresh(ctx)
@@ -117,9 +117,9 @@ func (l *Locker) LockWithContext(ctx context.Context) (bool, error) {
 
 // Unlock releases the lock
 func (l *Locker) Unlock() error {
-	l.mutex.Lock()
+	l.Mutex.Lock()
 	err := l.release()
-	l.mutex.Unlock()
+	l.Mutex.Unlock()
 
 	return err
 }
